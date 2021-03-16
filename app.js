@@ -1,4 +1,5 @@
 'use strict';
+const sequelize = require('./models').sequelize;
 
 // load modules
 const express = require('express');
@@ -39,6 +40,17 @@ app.use((err, req, res, next) => {
   });
 });
 
+//test the database connection
+(async () => {
+  try{
+    await sequelize.authenticate();
+    console.log('Connection has been established to the database');
+  }
+  catch(error){
+    console.error('Unable to connect to the database: ', error);
+  }
+})();
+
 // set our port
 app.set('port', process.env.PORT || 5000);
 
@@ -46,3 +58,5 @@ app.set('port', process.env.PORT || 5000);
 const server = app.listen(app.get('port'), () => {
   console.log(`Express server is listening on port ${server.address().port}`);
 });
+
+
