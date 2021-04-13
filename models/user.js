@@ -52,8 +52,45 @@ module.exports = (sequelize, DataTypes) => {
         msg: 'Please provie a last name'
       }
   },
-    emailAddress: DataTypes.STRING, //TODO validation for email using regEx
-    password: DataTypes.STRING //TODO: confirmed password and hash it
+    emailAddress: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        notNull: {
+          msg: 'An email is required'
+        },
+        notEmpty: {
+          msg: 'Please provide an email address'
+        },
+        validateEmail: function(value){ //adapted from Stackoverflow phonenumber regex validation post
+          let regexTest = /^[\w\d]+@[\w]+\.[\w]{2,3}$/m;
+          if(!(regexTest.test(value))){
+            throw new Error('phone format error!');
+          }
+    
+        }
+      }
+    }, //TODO validation for email using regEx
+    password: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      set(val){
+        const hashedPassword = bcyrpt.hasSync(val, 10);
+        this.setDataValue('password', hashedPassword);
+      },
+      validate: {
+        notNull: {
+          msg: 'A password is required'
+        },
+        notEmpty: {
+          msg: 'Please provide a password'
+        },
+        len: {
+          args: [8, 20],
+          msg: 'The password should be between 8 and 20 characters in length'
+        }
+      }
+  } //TODO: confirmed password and hash it
   }, {
     sequelize,
     modelName: 'User',
