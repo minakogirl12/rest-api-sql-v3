@@ -65,7 +65,7 @@ module.exports = (sequelize, DataTypes) => {
         validateEmail: function(value){ //adapted from Stackoverflow phonenumber regex validation post
           let regexTest = /^[\w\d]+@[\w]+\.[\w]{2,3}$/m;
           if(!(regexTest.test(value))){
-            throw new Error('phone format error!');
+            throw new Error('email format error!');
           }
     
         }
@@ -75,7 +75,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false,
       set(val){
-        const hashedPassword = bcyrpt.hasSync(val, 10);
+        const hashedPassword = bcrypt.hashSync(val, 10);
         this.setDataValue('password', hashedPassword);
       },
       validate: {
@@ -85,10 +85,6 @@ module.exports = (sequelize, DataTypes) => {
         notEmpty: {
           msg: 'Please provide a password'
         },
-        len: {
-          args: [8, 20],
-          msg: 'The password should be between 8 and 20 characters in length'
-        }
       }
   } //TODO: confirmed password and hash it
   }, {
