@@ -4,17 +4,24 @@ const { response } = require('express');
 const express = require('express');
 const {asyncHandler} = require('./middleware/async-handler'); //import async handler function
 const {User, Course} = require('./models');
+//
 //Construct a router instance
 const router = express.Router();
 
+//import authentication middleware
+const {authenticateUser} = require('./middleware/auth-user');
+
+//basic-auth import to access username of current user
+const auth = require('basic-auth'); //Basic authentication library
 
 //User Routes
 /*GET Returns the authenticate user with 200 HTTP status code */
-router.get('/users', asyncHandler(async (req, res) => {
+router.get('/users', authenticateUser, asyncHandler(async (req, res) => {
    // res.send('Returns list of users');
-    const users = await User.findAll();
+   const credentials = auth(req);
+   const user = await User.findOne({where: {emailAddress: credentials.name}});
     //return user info and status code 200
-    res.status(200).json(users);
+    res.status(200).json(user);
 }));
 
 /*POST Creates a new user, set Location header to / and return 201 status code with no content */
@@ -56,7 +63,7 @@ router.post('/users', asyncHandler( async(req, res) => {
     // Add the user to the database
      await User.create(user);
     // Set the status to 201 Created and end the response.
-    res.status(201).json(user).end();
+    res.redirect(201, '/');
   }
 
 }));
@@ -89,7 +96,7 @@ router.get('/courses/:id', asyncHandler( async(req, res) => {
 }));
 
 /*POST Creates a new course, sets the Location header to the URI for the new course, and returns 201 status code with no contet*/
-router.post('/courses', asyncHandler( async(req, res) => {
+router.post('/courses', authenticateUser, asyncHandler( async(req, res) => {
   //Get course info from request body
   const course = req.body;
 
@@ -127,7 +134,7 @@ router.post('/courses', asyncHandler( async(req, res) => {
 }));
 
 /*PUT Updates the corresponding course and returns 204 HTTP status code with no content*/
-router.put('/courses/:id', asyncHandler( async(req, res) => {
+router.put('/courses/:id', authenticateUser, asyncHandler( async(req, res) => {
   const course = await Course.findByPk(req.params.id);
   if(course){
     const info = req.body;
@@ -162,7 +169,7 @@ router.put('/courses/:id', asyncHandler( async(req, res) => {
 }));
 
 /*DELETE Deletes the corresponding course and returns 204 HTTP code and no content*/
-router.delete('/courses/:id', asyncHandler( async(req, res) => {
+router.delete('/courses/:id', authenticateUser, asyncHandler( async(req, res) => {
     const course = await Course.findByPk(req.params.id);
     if(course){
       await course.destroy(); //deletes the course
