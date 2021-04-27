@@ -72,24 +72,26 @@ router.post('/users', asyncHandler( async(req, res) => {
 //Courses Routes
 /*GET Returns a list of all courses including user that owns the course and 200 HTTP status code*/
 router.get('/courses', asyncHandler( async(req, res) => {
-    const courses = await Course.findAll();
+    const courses = await Course.findAll({ include: [{model: User, as: 'user'}]});
     res.status(200).json(courses);
 }));
 
 /*GET Returns the corresponding course, the User that owns the course, and a 200 HTTP Status code*/
 router.get('/courses/:id', asyncHandler( async(req, res) => {
-    const id = req.params.id;
-    console.log(id);
-    if(isNaN(id)){
-      res.status(400).json({error: 'Bad request: Query must be a number'});
+    const courseId = req.params.id;
+    console.log(courseId);
+    if(isNaN(courseId)){
+      res.status(400).json({error: 'Bad request: Please enter a course id'});
     }
     else{
-      const course = await Course.findByPk(id);
-      if(course){
+      //const course = await Course.findByPk(courseId);
+      const course = await Course.findAll({where: {id: courseId},
+        include: [{model: User, as: 'user'}]});
+      if(course.length > 0){
         res.status(200).json(course);
       }
       else{
-        res.status(400).json({error: 'Bad Request: Item does not exist'});
+        res.status(400).json({error: 'Bad Request: Course does not exist'});
       }
     
     }
