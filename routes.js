@@ -63,7 +63,7 @@ router.post('/users', asyncHandler( async(req, res) => {
     // Add the user to the database
      await User.create(user);
     // Set the status to 201 Created and end the response.
-    res.redirect(201, '/');
+    res.status(201).location('/').end();
   }
 
 }));
@@ -129,7 +129,7 @@ router.post('/courses', authenticateUser, asyncHandler( async(req, res) => {
     //create the course and add it to the database
      await Course.create(course);
     // Set the status to 201 Created and end the response.
-    res.status(201).end();
+    res.status(201).location('/').end();
   }
 }));
 
