@@ -51,8 +51,7 @@ router.post('/users', asyncHandler( async(req, res) => {
   else if(user.password.length < 8 || user.password.length > 20){
     errors.push("Your password must be between 8 and 20 characters");
   }
-  // TODO add password encrpytion
-
+  
   //if there are any errors
   if(errors.length > 0){
     //return errors to clients
@@ -129,9 +128,9 @@ router.post('/courses', authenticateUser, asyncHandler( async(req, res) => {
     //TODO Hash the password
 
     //create the course and add it to the database
-     await Course.create(course);
+    const courseCreated = await Course.create(course);
     // Set the status to 201 Created and end the response.
-    res.status(201).location('/').end();
+    res.status(201).location(`/${courseCreated.id}`).end();
   }
 }));
 
