@@ -28,7 +28,7 @@ router.get('/users', authenticateUser, asyncHandler(async (req, res) => {
 router.post('/users', asyncHandler( async(req, res) => {
      // Get the user from the request body.
         const user = req.body;
-    //Check for errors/missing data
+    //TODO: Check for can remove below and use a try catch block instead
   const errors = [];
   if(!user.firstName)//checks that  the name property exists and that it is not undefined, null, or empty
   {
@@ -130,7 +130,7 @@ router.post('/courses', authenticateUser, asyncHandler( async(req, res) => {
     //create the course and add it to the database
     const courseCreated = await Course.create(course);
     // Set the status to 201 Created and end the response.
-    res.status(201).location(`/${courseCreated.id}`).end();
+    res.status(201).location(`/courses/${courseCreated.id}`).end();
   }
 }));
 
